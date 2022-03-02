@@ -1,3 +1,3 @@
-module github.com/zhelnova/copyutil
+module copyutil
 
 go 1.17
