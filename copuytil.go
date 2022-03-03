@@ -1,10 +1,11 @@
 package copyutil
 
 import (
-	"ioutil"
+	"io/ioutil"
 	"os"
 	"io"
 	"github.com/cheggaaa/pb/v3"
+	"time"
 )
 
 func Copy(from string, to string, limit int, offset int) error {
@@ -12,10 +13,9 @@ func Copy(from string, to string, limit int, offset int) error {
 	fileFrom.Seek(int64(offset), io.SeekStart)
 	fileTo, err := os.Create(to)
 	bFrom, err := ioutil.ReadAll(fileFrom)
-	if len(bFrom) > limit {
-		bar := pb.StartNew(bFrom)
-	} else {
-		bar := pb.StartNew(limit)
+	bar := pb.StartNew(limit)
+	if len(bFrom) < limit {
+		bar = pb.StartNew(len(bFrom))
 	}
 	defer func() {
 		bar.Finish()
@@ -28,7 +28,7 @@ func Copy(from string, to string, limit int, offset int) error {
 		}
 		bar.Increment()
 		time.Sleep(time.Millisecond)
-		_, err := fileTo.Write(bFrom[i])
+		_, err := fileTo.Write([]byte{bFrom[i]})
 		if err != nil {
 			return err
 		}
